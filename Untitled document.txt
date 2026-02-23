@@ -1,0 +1,64 @@
+﻿Word search criteria
+
+
+The word search will have an add words function that when you press a + icon, a words configuration entry will be made where you can type in the word with its unique configs. There will be a button to generate the word search, in which it will generate a common puzzle style word search with all criteria. This is a repeatable step and not one time use. The puzzle generated should have a print ready download feature if possible.
+
+
+Importance determines priority of features listed below, 1 = most important, 3 = nice but not important
+
+
+Word List (1): must support at least 100 words, but will generally only have up to 20 words. There will be an “Add word” button that adds a configuration table to a list, and the configuration table will have many options for the individual word, each word will have its own set of configurations.
+
+
+The word configurations are: 
+
+
+Optional: Boolean - If the word spawns by chance, word will sometimes not appear
+
+
+CanRepeatedlySpawn : Boolean - determines if word can spawn multiple times, Default value is false
+
+
+SpawnWeight : Number - determines how often word spawns if allowed, 1 is base chance, 2 is double, should support decimals, effects chances if Optional or CanRepeatedlySpawn  is selected, Default value is 1
+
+
+Hint: String - if anything is input, then this text will be shown at the bottom of the page if the hint value is true.
+
+
+–end of word configurations
+
+
+General Configurations: These will be options before generation that affect the overall document. These are typically Booleans (checkbox) or Numbers/Integers (Type in the box)
+
+
+Configurations include: 
+
+
+Word directions : The options in this sub category are : Up, Down, UpwardHorizontal, DownwardHorizontal, and Reverse (reverse automatically applies to all other options if enabled.) By Default, all are enabled except reverse.
+
+
+Filler Letters : A type in the box where if nothing is typed, the alphabet will be used by default for filler letters. If anything is typed, such characters will be used as the filler letters. Any basic letter, symbol or number can be used. Supports upper and lower case letters. The Default Value is none.
+
+
+Letter Case : a drop setting with three options: Uppercase, Lowercase or Both (Upper and Lower are self explanatory, but Both makes word list and filler letters case sensitive, and if both isn’t the chosen setting, the word list and filler letters will be automatically set if possible.) The default value is Uppercase.
+
+
+Grid Size: has x and y value and determines the size of the word search. The default for both values is 15.
+
+
+Title : if value is put in, a title of said text will be at the top of the page. The default value is “Input Title”
+
+
+Word bank : if true, then all the words will be listed at the bottom of the page. For each word, if the word appears multiple times, then the amount of times it appears is listed. The default is true.
+
+
+ShowHints: if true, then shows listed hints if any above the word bank if such. The default is false.
+
+
+Intersect words : an option between 1 and 5, with 1 having words not intersect at all, and 5 has words intersect as much as possible. The default setting is 3.
+
+
+Generation Effort : a number between 1 and 100 that determines how much compute time is put into attempting to generate a puzzle. 1 is less time and 100 is much more. The default value is 20.
+
+
+–End configs.

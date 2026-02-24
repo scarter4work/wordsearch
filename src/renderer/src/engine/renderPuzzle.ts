@@ -45,11 +45,23 @@ export function renderPuzzleToDataUrl(
   const canvasWidth = Math.max(gridWidth + padding * 2, 400)
   const canvasHeight = contentHeight
 
+  // Target max dimensions for Letter page (72dpi) with 0.4in margins
+  const maxPageWidth = 736  // 816 - 80
+  const maxPageHeight = 976 // 1056 - 80
+
+  let scaleFactor = 1
+  if (canvasWidth > maxPageWidth || canvasHeight > maxPageHeight) {
+    scaleFactor = Math.min(maxPageWidth / canvasWidth, maxPageHeight / canvasHeight, 1)
+  }
+
+  const effectiveWidth = Math.round(canvasWidth * scaleFactor)
+  const effectiveHeight = Math.round(canvasHeight * scaleFactor)
+
   const canvas = document.createElement('canvas')
-  canvas.width = canvasWidth * scale
-  canvas.height = canvasHeight * scale
+  canvas.width = effectiveWidth * scale
+  canvas.height = effectiveHeight * scale
   const ctx = canvas.getContext('2d')!
-  ctx.scale(scale, scale)
+  ctx.scale(scale * scaleFactor, scale * scaleFactor)
 
   // White background
   ctx.fillStyle = '#ffffff'

@@ -22,7 +22,7 @@ export default function WordListPanel() {
   }
 
   return (
-    <div className="w-80 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <h2 className="text-lg font-semibold text-gray-100">

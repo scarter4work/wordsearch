@@ -39,7 +39,6 @@ function ToastContainer({ toasts }: { toasts: Toast[] }) {
 }
 
 export default function App() {
-  const [showSettings, setShowSettings] = useState(false)
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const addToast = useCallback((message: string) => {
@@ -60,43 +59,17 @@ export default function App() {
       <div className="flex flex-col h-screen bg-gray-950 text-white">
         <Header />
         <div className="flex flex-1 overflow-hidden">
-          {/* Left: WordListPanel */}
-          <WordListPanel />
-          {/* Right: puzzle + settings */}
+          {/* Left sidebar: settings + word list */}
+          <div className="w-80 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950 overflow-y-auto">
+            <ConfigPanel />
+            <DisplaySettingsPanel />
+            <WordListPanel />
+          </div>
+          {/* Right: puzzle area */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Puzzle area */}
             <div className="flex-1 overflow-auto p-6">
               <PuzzleGrid />
               <WordBankDisplay />
-            </div>
-            {/* Settings toggle */}
-            <div className="border-t border-gray-800">
-              <button
-                type="button"
-                onClick={() => setShowSettings(!showSettings)}
-                className="w-full px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-3 w-3 transition-transform duration-200 ${showSettings ? 'rotate-180' : ''}`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                Settings
-              </button>
-            </div>
-            {/* Collapsible settings panels */}
-            <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                showSettings ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-              }`}
-            >
-              <div className="overflow-y-auto max-h-80 bg-gray-900/80">
-                <ConfigPanel />
-                <DisplaySettingsPanel />
-              </div>
             </div>
           </div>
         </div>

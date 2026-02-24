@@ -45,6 +45,7 @@ export type Action =
   | { type: 'MARK_WORD_FOUND'; payload: { word: string; cells: Array<{ row: number; col: number }>; color: string } }
   | { type: 'RESET_SOLVER' }
   | { type: 'SET_SELECTION'; payload: { start: { row: number; col: number } | null; end: { row: number; col: number } | null } }
+  | { type: 'CLEAR_WORDS' }
   | { type: 'LOAD_STATE'; payload: { words: WordEntry[]; config: PuzzleConfig; display: DisplaySettings } }
 
 function resetSolver(): SolverState {
@@ -109,6 +110,9 @@ export function puzzleReducer(state: AppState, action: Action): AppState {
           selectionEnd: action.payload.end
         }
       }
+
+    case 'CLEAR_WORDS':
+      return { ...state, words: [] }
 
     case 'LOAD_STATE':
       return {

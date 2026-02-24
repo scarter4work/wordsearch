@@ -8,6 +8,11 @@ const FONT_OPTIONS = [
   'Comic Sans MS',
   'Impact',
   'Consolas',
+  'Trebuchet MS',
+  'Verdana',
+  'Times New Roman',
+  'Palatino Linotype',
+  'Lucida Console',
   'monospace'
 ]
 
@@ -60,9 +65,10 @@ export default function DisplaySettingsPanel() {
             value={display.fontFamily}
             onChange={(e) => updateDisplay({ fontFamily: e.target.value })}
             className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            style={{ fontFamily: display.fontFamily }}
           >
             {FONT_OPTIONS.map((font) => (
-              <option key={font} value={font}>
+              <option key={font} value={font} style={{ fontFamily: font }}>
                 {font}
               </option>
             ))}

@@ -69,7 +69,7 @@ export default function WordListPanel() {
       </div>
 
       {/* Scrollable word list */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto p-3 space-y-0.5">
         {state.words.map((word) => (
           <WordCard
             key={word.id}

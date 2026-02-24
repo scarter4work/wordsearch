@@ -102,7 +102,8 @@ export default function ConfigPanel() {
           >
             <option value="uppercase">Uppercase</option>
             <option value="lowercase">Lowercase</option>
-            <option value="both">Both</option>
+            <option value="preserve">Preserve</option>
+            <option value="random">Random</option>
           </select>
         </label>
 

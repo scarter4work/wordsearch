@@ -6,8 +6,12 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 function applyCase(word: string, letterCase: string): string {
   if (letterCase === 'lowercase') return word.toLowerCase()
   if (letterCase === 'uppercase') return word.toUpperCase()
-  // 'both' — randomly pick per word
-  return Math.random() < 0.5 ? word.toUpperCase() : word.toLowerCase()
+  if (letterCase === 'preserve') return word  // keep original casing as entered
+  // 'random' — randomly pick upper/lower per character
+  return word
+    .split('')
+    .map((ch) => (Math.random() < 0.5 ? ch.toUpperCase() : ch.toLowerCase()))
+    .join('')
 }
 
 function randomChar(fillerLetters: string, letterCase: string): string {
@@ -15,6 +19,7 @@ function randomChar(fillerLetters: string, letterCase: string): string {
   const ch = pool[Math.floor(Math.random() * pool.length)]
   if (letterCase === 'lowercase') return ch.toLowerCase()
   if (letterCase === 'uppercase') return ch.toUpperCase()
+  // 'preserve' and 'random' both get random case for filler
   return Math.random() < 0.5 ? ch.toUpperCase() : ch.toLowerCase()
 }
 

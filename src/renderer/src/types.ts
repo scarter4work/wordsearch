@@ -9,7 +9,7 @@ export interface WordEntry {
 
 export type Direction = 'up' | 'down' | 'upwardHorizontal' | 'downwardHorizontal'
 
-export type LetterCase = 'uppercase' | 'lowercase' | 'both'
+export type LetterCase = 'uppercase' | 'lowercase' | 'preserve' | 'random'
 
 export interface PuzzleConfig {
   directions: {

@@ -39,6 +39,22 @@ describe('puzzleReducer', () => {
     expect(state.puzzle).toEqual(puzzle)
   })
 
+  it('loads state with fresh solver and null puzzle', () => {
+    const loaded = {
+      words: [{ id: '1', word: 'HELLO', optional: false, canRepeatedlySpawn: false, spawnWeight: 1, hint: '' }],
+      config: { ...initialState.config, title: 'Loaded Puzzle' },
+      display: { ...initialState.display, fontSize: 24 }
+    }
+    const state = puzzleReducer(initialState, { type: 'LOAD_STATE', payload: loaded })
+    expect(state.words).toHaveLength(1)
+    expect(state.words[0].word).toBe('HELLO')
+    expect(state.config.title).toBe('Loaded Puzzle')
+    expect(state.display.fontSize).toBe(24)
+    expect(state.puzzle).toBeNull()
+    expect(state.solver.foundWords).toBeInstanceOf(Set)
+    expect(state.solver.foundCells).toBeInstanceOf(Map)
+  })
+
   it('resets solver when new puzzle is generated', () => {
     const stateWithFound = { ...initialState, solver: { ...initialState.solver, foundWords: new Set(['TEST']) } }
     const puzzle = { grid: [['A']], placedWords: [], skippedWords: [], wordCounts: {}, hints: [] }

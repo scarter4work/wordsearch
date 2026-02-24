@@ -22,17 +22,18 @@ export default function WordListPanel() {
   }
 
   return (
-    <div className="w-80 flex-shrink-0 border-r border-gray-700 flex flex-col bg-gray-900">
+    <div className="w-80 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
-        <h2 className="text-lg font-semibold text-white">
-          Word List ({state.words.length})
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
+        <h2 className="text-lg font-semibold text-gray-100">
+          Word List
+          <span className="ml-2 text-sm font-normal text-gray-500">({state.words.length})</span>
         </h2>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="bg-gray-700 hover:bg-gray-600 text-white rounded-md px-3 py-1 text-sm font-medium transition-colors"
+            className="bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all duration-200 border border-gray-700/50 hover:scale-[1.05]"
             title="Search for words"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -42,10 +43,12 @@ export default function WordListPanel() {
           <button
             type="button"
             onClick={addWord}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-md px-3 py-1 text-sm font-medium transition-colors"
+            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all duration-200 hover:scale-[1.05] hover:shadow-lg hover:shadow-blue-500/20"
             title="Add word"
           >
-            +
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
           </button>
         </div>
       </div>
@@ -63,9 +66,15 @@ export default function WordListPanel() {
           />
         ))}
         {state.words.length === 0 && (
-          <p className="text-gray-500 text-sm text-center mt-8">
-            No words yet. Click + to add one.
-          </p>
+          <div className="text-center mt-12 px-4">
+            <div className="text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <p className="text-gray-500 text-sm">No words yet.</p>
+            <p className="text-gray-600 text-xs mt-1">Click + to add one, or use search to find words by concept.</p>
+          </div>
         )}
       </div>
 

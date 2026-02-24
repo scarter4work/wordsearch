@@ -81,9 +81,13 @@ export default function PuzzleGrid() {
 
   if (!puzzle) {
     return (
-      <p className="text-gray-500 text-lg text-center py-12">
-        Add words and click Generate to create your puzzle
-      </p>
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+        <p className="text-gray-500 text-lg font-medium">No puzzle yet</p>
+        <p className="text-gray-600 text-sm mt-1">Add words and click Generate to create your puzzle</p>
+      </div>
     )
   }
 
@@ -95,85 +99,87 @@ export default function PuzzleGrid() {
   // Build a set of highlighted cell keys for fast lookup
   const highlightSet = new Set(highlightedCells.map((c) => `${c.row},${c.col}`))
 
+  // Progress percentage
+  const progressPct = totalWords > 0 ? (foundCount / totalWords) * 100 : 0
+
   return (
     <div>
       {/* Progress indicator */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-gray-300">
-          {foundCount} / {totalWords} words found
-        </span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-300 font-medium">
+            {foundCount} / {totalWords} words found
+          </span>
+          <div className="w-32 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-500"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
         <button
           type="button"
           onClick={handleRevealAll}
-          className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+          className="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700/50 transition-all duration-200 hover:scale-[1.02] text-gray-300 hover:text-white"
         >
           Reveal All
         </button>
       </div>
 
-      {/* Grid */}
-      <div
-        className="inline-grid"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-          gap: `${display.cellSpacing}px`
-        }}
-        onMouseLeave={() => {
-          if (isDragging.current) {
-            isDragging.current = false
-            setDragStart(null)
-            setHighlightedCells([])
-            dispatch({ type: 'SET_SELECTION', payload: { start: null, end: null } })
-          }
-        }}
-      >
-        {puzzle.grid.flatMap((row, rowIdx) =>
-          row.map((letter, colIdx) => {
-            const cellKey = `${rowIdx},${colIdx}`
-            const foundColor = solver.foundCells.get(cellKey)
-            const isHighlighted = highlightSet.has(cellKey)
-
-            let bgStyle: string | undefined
-            let bgColor: string | undefined
-
-            if (isHighlighted) {
-              bgStyle = undefined
-              bgColor = undefined
-            } else if (foundColor) {
-              bgStyle = undefined
-              bgColor = foundColor
+      {/* Grid container */}
+      <div className="inline-block rounded-xl border border-gray-800 shadow-lg shadow-black/30 bg-gray-900/50 p-3">
+        <div
+          className="inline-grid"
+          style={{
+            gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
+            gap: `${display.cellSpacing}px`
+          }}
+          onMouseLeave={() => {
+            if (isDragging.current) {
+              isDragging.current = false
+              setDragStart(null)
+              setHighlightedCells([])
+              dispatch({ type: 'SET_SELECTION', payload: { start: null, end: null } })
             }
+          }}
+        >
+          {puzzle.grid.flatMap((row, rowIdx) =>
+            row.map((letter, colIdx) => {
+              const cellKey = `${rowIdx},${colIdx}`
+              const foundColor = solver.foundCells.get(cellKey)
+              const isHighlighted = highlightSet.has(cellKey)
 
-            return (
-              <div
-                key={cellKey}
-                className={`rounded flex items-center justify-center select-none cursor-pointer ${
-                  isHighlighted
-                    ? 'bg-blue-500/50'
-                    : foundColor
-                      ? ''
-                      : 'bg-gray-700'
-                }`}
-                style={{
-                  width: cellSize,
-                  height: cellSize,
-                  fontFamily: display.fontFamily,
-                  fontSize: `${display.fontSize}px`,
-                  lineHeight: 1,
-                  ...(foundColor && !isHighlighted ? { backgroundColor: foundColor, opacity: 0.8 } : {})
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  handleMouseDown(rowIdx, colIdx)
-                }}
-                onMouseEnter={() => handleMouseEnter(rowIdx, colIdx)}
-                onMouseUp={handleMouseUp}
-              >
-                {letter}
-              </div>
-            )
-          })
-        )}
+              return (
+                <div
+                  key={cellKey}
+                  className={`rounded-md flex items-center justify-center select-none cursor-pointer font-medium transition-all duration-150 ${
+                    isHighlighted
+                      ? 'bg-blue-500/50 scale-105'
+                      : foundColor
+                        ? 'rounded-md'
+                        : 'bg-gray-800 hover:bg-gray-700/80'
+                  }`}
+                  style={{
+                    width: cellSize,
+                    height: cellSize,
+                    fontFamily: display.fontFamily,
+                    fontSize: `${display.fontSize}px`,
+                    lineHeight: 1,
+                    ...(foundColor && !isHighlighted ? { backgroundColor: foundColor, opacity: 0.85 } : {})
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    handleMouseDown(rowIdx, colIdx)
+                  }}
+                  onMouseEnter={() => handleMouseEnter(rowIdx, colIdx)}
+                  onMouseUp={handleMouseUp}
+                >
+                  {letter}
+                </div>
+              )
+            })
+          )}
+        </div>
       </div>
     </div>
   )

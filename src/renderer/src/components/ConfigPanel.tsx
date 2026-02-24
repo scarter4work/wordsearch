@@ -13,35 +13,41 @@ export default function ConfigPanel() {
 
   if (collapsed) {
     return (
-      <div className="border-t border-gray-700">
+      <div className="border-t border-gray-800">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          className="w-full px-4 py-2 text-left text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center gap-2"
+          className="w-full px-4 py-2.5 text-left text-sm text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-200 flex items-center gap-2"
         >
-          <span className="text-xs">&#9654;</span> Configuration
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          </svg>
+          Configuration
         </button>
       </div>
     )
   }
 
   return (
-    <div className="border-t border-gray-700">
+    <div className="border-t border-gray-800">
       <button
         type="button"
         onClick={() => setCollapsed(true)}
-        className="w-full px-4 py-2 text-left text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors flex items-center gap-2"
+        className="w-full px-4 py-2.5 text-left text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-200 flex items-center gap-2"
       >
-        <span className="text-xs">&#9660;</span> Configuration
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+        Configuration
       </button>
 
       <div className="px-4 pb-4 space-y-4">
         {/* Word Directions */}
         <fieldset>
-          <legend className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">
+          <legend className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
             Word Directions
           </legend>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {([
               ['up', 'Up'],
               ['down', 'Down'],
@@ -49,7 +55,7 @@ export default function ConfigPanel() {
               ['downwardHorizontal', 'Downward Diagonal'],
               ['reverse', 'Reverse']
             ] as const).map(([key, label]) => (
-              <label key={key} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+              <label key={key} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-gray-200 transition-colors">
                 <input
                   type="checkbox"
                   checked={config.directions[key]}
@@ -66,11 +72,11 @@ export default function ConfigPanel() {
           </div>
         </fieldset>
 
-        <hr className="border-gray-700" />
+        <hr className="border-gray-800" />
 
         {/* Filler Letters */}
         <label className="block">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
             Filler Letters
           </span>
           <input
@@ -78,21 +84,21 @@ export default function ConfigPanel() {
             value={config.fillerLetters}
             onChange={(e) => updateConfig({ fillerLetters: e.target.value })}
             placeholder="Leave empty for full alphabet"
-            className="mt-1 w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
         </label>
 
-        <hr className="border-gray-700" />
+        <hr className="border-gray-800" />
 
         {/* Letter Case */}
         <label className="block">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
             Letter Case
           </span>
           <select
             value={config.letterCase}
             onChange={(e) => updateConfig({ letterCase: e.target.value as LetterCase })}
-            className="mt-1 w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+            className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           >
             <option value="uppercase">Uppercase</option>
             <option value="lowercase">Lowercase</option>
@@ -100,59 +106,59 @@ export default function ConfigPanel() {
           </select>
         </label>
 
-        <hr className="border-gray-700" />
+        <hr className="border-gray-800" />
 
         {/* Grid Size */}
         <fieldset>
-          <legend className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">
+          <legend className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">
             Grid Size
           </legend>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <label className="flex-1">
-              <span className="text-xs text-gray-500">X</span>
+              <span className="text-xs text-gray-500">Width</span>
               <input
                 type="number"
                 min={5}
                 max={50}
                 value={config.gridWidth}
                 onChange={(e) => updateConfig({ gridWidth: Math.max(5, Math.min(50, Number(e.target.value))) })}
-                className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </label>
             <label className="flex-1">
-              <span className="text-xs text-gray-500">Y</span>
+              <span className="text-xs text-gray-500">Height</span>
               <input
                 type="number"
                 min={5}
                 max={50}
                 value={config.gridHeight}
                 onChange={(e) => updateConfig({ gridHeight: Math.max(5, Math.min(50, Number(e.target.value))) })}
-                className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </label>
           </div>
         </fieldset>
 
-        <hr className="border-gray-700" />
+        <hr className="border-gray-800" />
 
         {/* Title */}
         <label className="block">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
             Title
           </span>
           <input
             type="text"
             value={config.title}
             onChange={(e) => updateConfig({ title: e.target.value })}
-            className="mt-1 w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+            className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
         </label>
 
-        <hr className="border-gray-700" />
+        <hr className="border-gray-800" />
 
         {/* Checkboxes */}
         <div className="space-y-2">
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-gray-200 transition-colors">
             <input
               type="checkbox"
               checked={config.wordBank}
@@ -161,7 +167,7 @@ export default function ConfigPanel() {
             />
             Show Word Bank
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-gray-200 transition-colors">
             <input
               type="checkbox"
               checked={config.showHints}
@@ -172,41 +178,41 @@ export default function ConfigPanel() {
           </label>
         </div>
 
-        <hr className="border-gray-700" />
+        <hr className="border-gray-800" />
 
         {/* Word Intersection */}
         <label className="block">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
             Word Intersection
           </span>
-          <div className="flex items-center gap-3 mt-1">
+          <div className="flex items-center gap-3 mt-1.5">
             <input
               type="range"
               min={1}
               max={5}
               value={config.intersectWords}
               onChange={(e) => updateConfig({ intersectWords: Number(e.target.value) })}
-              className="flex-1 accent-blue-500"
+              className="flex-1"
             />
-            <span className="text-sm text-gray-300 w-6 text-right">{config.intersectWords}</span>
+            <span className="text-sm text-gray-300 w-6 text-right font-medium">{config.intersectWords}</span>
           </div>
         </label>
 
         {/* Generation Effort */}
         <label className="block">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
             Generation Effort
           </span>
-          <div className="flex items-center gap-3 mt-1">
+          <div className="flex items-center gap-3 mt-1.5">
             <input
               type="range"
               min={1}
               max={100}
               value={config.generationEffort}
               onChange={(e) => updateConfig({ generationEffort: Number(e.target.value) })}
-              className="flex-1 accent-blue-500"
+              className="flex-1"
             />
-            <span className="text-sm text-gray-300 w-8 text-right">{config.generationEffort}</span>
+            <span className="text-sm text-gray-300 w-8 text-right font-medium">{config.generationEffort}</span>
           </div>
         </label>
       </div>

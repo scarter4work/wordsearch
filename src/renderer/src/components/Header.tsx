@@ -1,13 +1,11 @@
-import { useRef, useCallback, useState } from 'react'
-import html2canvas from 'html2canvas'
+import { useCallback, useState } from 'react'
 import { usePuzzle } from '@/state/PuzzleContext'
 import { generatePuzzle } from '@/engine/generatePuzzle'
+import { renderPuzzleToDataUrl } from '@/engine/renderPuzzle'
 import { useToast } from '../App'
-import PrintView from './PrintView'
 
 export default function Header() {
   const { state, dispatch } = usePuzzle()
-  const printRef = useRef<HTMLDivElement>(null)
   const { addToast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -30,22 +28,18 @@ export default function Header() {
   }
 
   const handleExportPdf = useCallback(async () => {
-    const el = printRef.current
-    if (!el) return
-    const canvas = await html2canvas(el, { backgroundColor: '#ffffff' })
-    const dataUrl = canvas.toDataURL('image/png')
+    if (!state.puzzle) return
+    const dataUrl = renderPuzzleToDataUrl(state.puzzle, state.config, state.display)
     await window.api.exportPdf(dataUrl)
     addToast('Export complete')
-  }, [addToast])
+  }, [state.puzzle, state.config, state.display, addToast])
 
   const handleExportPng = useCallback(async () => {
-    const el = printRef.current
-    if (!el) return
-    const canvas = await html2canvas(el, { backgroundColor: '#ffffff' })
-    const dataUrl = canvas.toDataURL('image/png')
+    if (!state.puzzle) return
+    const dataUrl = renderPuzzleToDataUrl(state.puzzle, state.config, state.display)
     await window.api.exportPng(dataUrl)
     addToast('Export complete')
-  }, [addToast])
+  }, [state.puzzle, state.config, state.display, addToast])
 
   const handleSave = useCallback(async () => {
     const json = JSON.stringify({ version: 1, words: state.words, config: state.config, display: state.display })
@@ -151,20 +145,6 @@ export default function Header() {
           </button>
         </div>
       </header>
-
-      {/* Off-screen PrintView for PNG capture */}
-      {state.puzzle && (
-        <div
-          ref={printRef}
-          style={{ position: 'absolute', left: '-9999px', top: 0 }}
-        >
-          <PrintView
-            puzzle={state.puzzle}
-            config={state.config}
-            display={state.display}
-          />
-        </div>
-      )}
     </>
   )
 }

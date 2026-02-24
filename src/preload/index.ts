@@ -1,5 +1,6 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('api', {
-  // Will be populated with IPC methods in later tasks
+  exportPdf: (): Promise<string | null> => ipcRenderer.invoke('export-pdf'),
+  exportPng: (dataUrl: string): Promise<string | null> => ipcRenderer.invoke('export-png', dataUrl)
 })

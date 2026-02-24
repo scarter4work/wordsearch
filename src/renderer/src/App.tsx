@@ -1,5 +1,8 @@
 import { useState } from 'react'
+import Header from './components/Header'
 import WordListPanel from './components/WordListPanel'
+import PuzzleGrid from './components/PuzzleGrid'
+import WordBankDisplay from './components/WordBankDisplay'
 import ConfigPanel from './components/ConfigPanel'
 import DisplaySettingsPanel from './components/DisplaySettingsPanel'
 
@@ -8,17 +11,16 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
-      {/* Header area - to be added in Task 6 */}
+      <Header />
       <div className="flex flex-1 overflow-hidden">
         {/* Left: WordListPanel */}
         <WordListPanel />
         {/* Right: puzzle + settings */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Puzzle area */}
-          <div className="flex-1 p-4 flex items-center justify-center">
-            <p className="text-gray-500 text-lg">
-              Puzzle area — generate a puzzle to see it here
-            </p>
+          <div className="flex-1 overflow-auto p-4">
+            <PuzzleGrid />
+            <WordBankDisplay />
           </div>
           {/* Settings toggle */}
           <div className="border-t border-gray-700">

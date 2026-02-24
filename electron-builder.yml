@@ -1,0 +1,15 @@
+appId: com.wordsearch.generator
+productName: Word Search Generator
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**/*
+win:
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

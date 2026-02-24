@@ -32,41 +32,40 @@ export default function PrintView({ puzzle, config, display }: PrintViewProps) {
         {config.title}
       </h1>
 
-      {/* Grid */}
-      <div
+      {/* Grid - using table for reliable html2canvas centering */}
+      <table
         style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${grid[0].length}, ${cellSize}px)`,
-          gridTemplateRows: `repeat(${grid.length}, ${cellSize}px)`,
-          border: '1px solid #000',
-          width: 'fit-content',
-          margin: '0 auto 24px'
+          borderCollapse: 'collapse',
+          margin: '0 auto 24px',
+          border: '1px solid #000'
         }}
       >
-        {grid.flatMap((row, r) =>
-          row.map((letter, c) => (
-            <div
-              key={`${r}-${c}`}
-              style={{
-                width: cellSize,
-                height: cellSize,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: display.fontSize,
-                fontFamily: display.fontFamily,
-                fontWeight: 600,
-                border: '1px solid #ccc',
-                boxSizing: 'border-box',
-                lineHeight: 1,
-                textAlign: 'center' as const
-              }}
-            >
-              {letter}
-            </div>
-          ))
-        )}
-      </div>
+        <tbody>
+          {grid.map((row, r) => (
+            <tr key={r}>
+              {row.map((letter, c) => (
+                <td
+                  key={`${r}-${c}`}
+                  style={{
+                    width: cellSize,
+                    height: cellSize,
+                    textAlign: 'center' as const,
+                    verticalAlign: 'middle' as const,
+                    fontSize: display.fontSize,
+                    fontFamily: display.fontFamily,
+                    fontWeight: 600,
+                    border: '1px solid #ccc',
+                    padding: 0,
+                    lineHeight: `${cellSize}px`
+                  }}
+                >
+                  {letter}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       {/* Hints */}
       {config.showHints && hints.length > 0 && (

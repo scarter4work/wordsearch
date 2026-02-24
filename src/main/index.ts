@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
-import { writeFile } from 'fs/promises'
+import { writeFile, readFile } from 'fs/promises'
 import { is } from '@electron-toolkit/utils'
 
 function createWindow(): void {
@@ -40,6 +40,30 @@ ipcMain.handle('export-pdf', async (event) => {
   })
   await writeFile(filePath, pdf)
   return filePath
+})
+
+ipcMain.handle('save-project', async (event, data: string) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return null
+  const { filePath } = await dialog.showSaveDialog(win, {
+    defaultPath: 'wordsearch.json',
+    filters: [{ name: 'Word Search Project', extensions: ['json'] }]
+  })
+  if (!filePath) return null
+  await writeFile(filePath, data, 'utf-8')
+  return filePath
+})
+
+ipcMain.handle('load-project', async (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return null
+  const { filePaths } = await dialog.showOpenDialog(win, {
+    filters: [{ name: 'Word Search Project', extensions: ['json'] }],
+    properties: ['openFile']
+  })
+  if (!filePaths.length) return null
+  const content = await readFile(filePaths[0], 'utf-8')
+  return content
 })
 
 ipcMain.handle('export-png', async (_event, dataUrl: string) => {

@@ -97,7 +97,15 @@ input[type='checkbox'] {
   accent-color: #3b82f6;
 }
 
-/* Selection highlight for grid */
+/* Global text selection — high contrast for dark UI */
 ::selection {
-  background: transparent;
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+/* Suppress text selection on the puzzle grid only */
+.puzzle-grid-area,
+.puzzle-grid-area * {
+  -webkit-user-select: none;
+  user-select: none;
 }

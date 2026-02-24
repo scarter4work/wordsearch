@@ -25,7 +25,11 @@ export default function WordBankDisplay() {
       <h3 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Word Bank</h3>
       <div className="flex flex-wrap gap-2">
         {wordEntries.map(([word, count]) => {
-          const isFound = solver.foundWords.has(word)
+          // Check if all placements of this word are found
+          const isFound = puzzle.placedWords
+            .map((pw, idx) => ({ pw, idx }))
+            .filter(({ pw }) => pw.word === word)
+            .every(({ idx }) => solver.foundWords.has(idx))
           return (
             <span
               key={word}

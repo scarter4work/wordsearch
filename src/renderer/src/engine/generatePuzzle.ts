@@ -6,8 +6,12 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 function applyCase(word: string, letterCase: string): string {
   if (letterCase === 'lowercase') return word.toLowerCase()
   if (letterCase === 'uppercase') return word.toUpperCase()
-  // 'both' — randomly pick per word
-  return Math.random() < 0.5 ? word.toUpperCase() : word.toLowerCase()
+  if (letterCase === 'preserve') return word  // keep original casing as entered
+  // 'random' — randomly pick upper/lower per character
+  return word
+    .split('')
+    .map((ch) => (Math.random() < 0.5 ? ch.toUpperCase() : ch.toLowerCase()))
+    .join('')
 }
 
 function randomChar(fillerLetters: string, letterCase: string): string {
@@ -15,6 +19,7 @@ function randomChar(fillerLetters: string, letterCase: string): string {
   const ch = pool[Math.floor(Math.random() * pool.length)]
   if (letterCase === 'lowercase') return ch.toLowerCase()
   if (letterCase === 'uppercase') return ch.toUpperCase()
+  // 'preserve' and 'random' both get random case for filler
   return Math.random() < 0.5 ? ch.toUpperCase() : ch.toLowerCase()
 }
 
@@ -82,6 +87,74 @@ function tryPlace(
   return best
 }
 
+function tryPlaceTargeted(
+  grid: (string | null)[][],
+  word: string,
+  directions: DirectionVector[],
+  maxAttempts: number,
+  intersectNorm: number
+): PlacementCandidate | null {
+  const height = grid.length
+  const width = grid[0].length
+
+  // Collect cells where existing letters match any letter in the word
+  const matchingCells: Array<{ row: number; col: number; charIdx: number }> = []
+  for (let r = 0; r < height; r++) {
+    for (let c = 0; c < width; c++) {
+      if (grid[r][c] !== null) {
+        for (let ci = 0; ci < word.length; ci++) {
+          if (grid[r][c] === word[ci]) {
+            matchingCells.push({ row: r, col: c, charIdx: ci })
+          }
+        }
+      }
+    }
+  }
+
+  if (matchingCells.length === 0) return null
+
+  let best: PlacementCandidate | null = null
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const match = matchingCells[Math.floor(Math.random() * matchingCells.length)]
+    const dir = directions[Math.floor(Math.random() * directions.length)]
+
+    const startRow = match.row - dir.dRow * match.charIdx
+    const startCol = match.col - dir.dCol * match.charIdx
+
+    const endRow = startRow + dir.dRow * (word.length - 1)
+    const endCol = startCol + dir.dCol * (word.length - 1)
+    if (startRow < 0 || startRow >= height || startCol < 0 || startCol >= width) continue
+    if (endRow < 0 || endRow >= height || endCol < 0 || endCol >= width) continue
+
+    let valid = true
+    let intersections = 0
+    const cells: Array<{ row: number; col: number }> = []
+
+    for (let i = 0; i < word.length; i++) {
+      const r = startRow + dir.dRow * i
+      const c = startCol + dir.dCol * i
+      const existing = grid[r][c]
+      if (existing !== null && existing !== word[i]) {
+        valid = false
+        break
+      }
+      if (existing === word[i]) intersections++
+      cells.push({ row: r, col: c })
+    }
+
+    if (!valid) continue
+
+    const score = intersections * intersectNorm + Math.random() * 0.1
+    if (best === null || score > best.score) {
+      best = { row: startRow, col: startCol, dir, score, cells }
+    }
+    if (best.score > 1) break
+  }
+
+  return best
+}
+
 function buildPlacementList(words: WordEntry[], letterCase: string): Array<{ word: string; hint: string }> {
   const list: Array<{ word: string; hint: string }> = []
 
@@ -131,7 +204,10 @@ export function generatePuzzle(words: WordEntry[], config: PuzzleConfig): Genera
   const hints: Array<{ word: string; hint: string }> = []
 
   for (const entry of placementList) {
-    const candidate = tryPlace(grid, entry.word, directions, maxAttempts, intersectNorm)
+    const candidate =
+      tryPlace(grid, entry.word, directions, maxAttempts, intersectNorm) ??
+      tryPlace(grid, entry.word, directions, maxAttempts * 2, intersectNorm) ??
+      tryPlaceTargeted(grid, entry.word, directions, maxAttempts * 2, intersectNorm)
 
     if (candidate) {
       // Place the word on the grid

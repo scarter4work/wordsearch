@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePuzzle } from '../state/PuzzleContext'
 import type { LetterCase } from '../types'
 
@@ -6,6 +6,11 @@ export default function ConfigPanel() {
   const { state, dispatch } = usePuzzle()
   const { config } = state
   const [collapsed, setCollapsed] = useState(false)
+  const [localGridWidth, setLocalGridWidth] = useState(String(config.gridWidth))
+  const [localGridHeight, setLocalGridHeight] = useState(String(config.gridHeight))
+
+  useEffect(() => { setLocalGridWidth(String(config.gridWidth)) }, [config.gridWidth])
+  useEffect(() => { setLocalGridHeight(String(config.gridHeight)) }, [config.gridHeight])
 
   function updateConfig(changes: Parameters<typeof dispatch>[0] extends { type: 'UPDATE_CONFIG'; payload: infer P } ? P : never) {
     dispatch({ type: 'UPDATE_CONFIG', payload: changes })
@@ -102,7 +107,8 @@ export default function ConfigPanel() {
           >
             <option value="uppercase">Uppercase</option>
             <option value="lowercase">Lowercase</option>
-            <option value="both">Both</option>
+            <option value="preserve">Preserve</option>
+            <option value="random">Random</option>
           </select>
         </label>
 
@@ -120,8 +126,13 @@ export default function ConfigPanel() {
                 type="number"
                 min={5}
                 max={50}
-                value={config.gridWidth}
-                onChange={(e) => updateConfig({ gridWidth: Math.max(5, Math.min(50, Number(e.target.value))) })}
+                value={localGridWidth}
+                onChange={(e) => setLocalGridWidth(e.target.value)}
+                onBlur={() => {
+                  const v = Math.max(5, Math.min(50, Number(localGridWidth) || 5))
+                  setLocalGridWidth(String(v))
+                  updateConfig({ gridWidth: v })
+                }}
                 className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </label>
@@ -131,8 +142,13 @@ export default function ConfigPanel() {
                 type="number"
                 min={5}
                 max={50}
-                value={config.gridHeight}
-                onChange={(e) => updateConfig({ gridHeight: Math.max(5, Math.min(50, Number(e.target.value))) })}
+                value={localGridHeight}
+                onChange={(e) => setLocalGridHeight(e.target.value)}
+                onBlur={() => {
+                  const v = Math.max(5, Math.min(50, Number(localGridHeight) || 5))
+                  setLocalGridHeight(String(v))
+                  updateConfig({ gridHeight: v })
+                }}
                 className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </label>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePuzzle } from '../state/PuzzleContext'
 
 const FONT_OPTIONS = [
@@ -8,6 +8,11 @@ const FONT_OPTIONS = [
   'Comic Sans MS',
   'Impact',
   'Consolas',
+  'Trebuchet MS',
+  'Verdana',
+  'Times New Roman',
+  'Palatino Linotype',
+  'Lucida Console',
   'monospace'
 ]
 
@@ -15,6 +20,11 @@ export default function DisplaySettingsPanel() {
   const { state, dispatch } = usePuzzle()
   const { display } = state
   const [collapsed, setCollapsed] = useState(false)
+  const [localFontSize, setLocalFontSize] = useState(String(display.fontSize))
+  const [localCellSpacing, setLocalCellSpacing] = useState(String(display.cellSpacing))
+
+  useEffect(() => { setLocalFontSize(String(display.fontSize)) }, [display.fontSize])
+  useEffect(() => { setLocalCellSpacing(String(display.cellSpacing)) }, [display.cellSpacing])
 
   function updateDisplay(changes: Partial<typeof display>) {
     dispatch({ type: 'UPDATE_DISPLAY', payload: changes })
@@ -60,9 +70,10 @@ export default function DisplaySettingsPanel() {
             value={display.fontFamily}
             onChange={(e) => updateDisplay({ fontFamily: e.target.value })}
             className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            style={{ fontFamily: display.fontFamily }}
           >
             {FONT_OPTIONS.map((font) => (
-              <option key={font} value={font}>
+              <option key={font} value={font} style={{ fontFamily: font }}>
                 {font}
               </option>
             ))}
@@ -78,8 +89,13 @@ export default function DisplaySettingsPanel() {
             type="number"
             min={8}
             max={48}
-            value={display.fontSize}
-            onChange={(e) => updateDisplay({ fontSize: Math.max(8, Math.min(48, Number(e.target.value))) })}
+            value={localFontSize}
+            onChange={(e) => setLocalFontSize(e.target.value)}
+            onBlur={() => {
+              const v = Math.max(8, Math.min(48, Number(localFontSize) || 8))
+              setLocalFontSize(String(v))
+              updateDisplay({ fontSize: v })
+            }}
             className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
         </label>
@@ -93,8 +109,13 @@ export default function DisplaySettingsPanel() {
             type="number"
             min={0}
             max={16}
-            value={display.cellSpacing}
-            onChange={(e) => updateDisplay({ cellSpacing: Math.max(0, Math.min(16, Number(e.target.value))) })}
+            value={localCellSpacing}
+            onChange={(e) => setLocalCellSpacing(e.target.value)}
+            onBlur={() => {
+              const v = Math.max(0, Math.min(16, Number(localCellSpacing) || 0))
+              setLocalCellSpacing(String(v))
+              updateDisplay({ cellSpacing: v })
+            }}
             className="mt-1.5 w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
         </label>

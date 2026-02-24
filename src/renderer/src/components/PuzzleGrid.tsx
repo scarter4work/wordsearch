@@ -51,12 +51,13 @@ export default function PuzzleGrid() {
     isDragging.current = false
 
     if (highlightedCells.length > 0) {
-      const matchedWord = checkWordMatch(highlightedCells, puzzle.placedWords)
-      if (matchedWord && !solver.foundWords.has(matchedWord)) {
+      const matchedIdx = checkWordMatch(highlightedCells, puzzle.placedWords)
+      if (matchedIdx !== null && !solver.foundWords.has(matchedIdx)) {
         const color = getNextColor()
+        const pw = puzzle.placedWords[matchedIdx]
         dispatch({
           type: 'MARK_WORD_FOUND',
-          payload: { word: matchedWord, cells: highlightedCells, color }
+          payload: { index: matchedIdx, word: pw.word, cells: highlightedCells, color }
         })
       }
     }
@@ -68,15 +69,15 @@ export default function PuzzleGrid() {
 
   const handleRevealAll = useCallback(() => {
     if (!puzzle) return
-    for (const pw of puzzle.placedWords) {
-      if (!solver.foundWords.has(pw.word)) {
+    puzzle.placedWords.forEach((pw, idx) => {
+      if (!solver.foundWords.has(idx)) {
         const color = getNextColor()
         dispatch({
           type: 'MARK_WORD_FOUND',
-          payload: { word: pw.word, cells: pw.cells, color }
+          payload: { index: idx, word: pw.word, cells: pw.cells, color }
         })
       }
-    }
+    })
   }, [puzzle, solver.foundWords, getNextColor, dispatch])
 
   if (!puzzle) {
@@ -127,12 +128,12 @@ export default function PuzzleGrid() {
       </div>
 
       {/* Grid container */}
-      <div className="inline-block rounded-xl border border-gray-800 shadow-lg shadow-black/30 bg-gray-900/50 p-3">
+      <div className="puzzle-grid-area relative inline-block border-2 border-gray-300 shadow-lg shadow-black/30 bg-gray-900/50">
         <div
           className="inline-grid"
           style={{
             gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-            gap: `${display.cellSpacing}px`
+            gap: '0px'
           }}
           onMouseLeave={() => {
             if (isDragging.current) {
@@ -146,18 +147,15 @@ export default function PuzzleGrid() {
           {puzzle.grid.flatMap((row, rowIdx) =>
             row.map((letter, colIdx) => {
               const cellKey = `${rowIdx},${colIdx}`
-              const foundColor = solver.foundCells.get(cellKey)
               const isHighlighted = highlightSet.has(cellKey)
 
               return (
                 <div
                   key={cellKey}
-                  className={`rounded-md flex items-center justify-center select-none cursor-pointer font-medium transition-all duration-150 ${
+                  className={`flex items-center justify-center select-none cursor-pointer font-medium transition-all duration-150 border-[0.5px] border-gray-700/40 ${
                     isHighlighted
-                      ? 'bg-blue-500/50 scale-105'
-                      : foundColor
-                        ? 'rounded-md'
-                        : 'bg-gray-800 hover:bg-gray-700/80'
+                      ? 'bg-blue-500/50'
+                      : 'hover:bg-gray-800/50'
                   }`}
                   style={{
                     width: cellSize,
@@ -165,7 +163,6 @@ export default function PuzzleGrid() {
                     fontFamily: display.fontFamily,
                     fontSize: `${display.fontSize}px`,
                     lineHeight: 1,
-                    ...(foundColor && !isHighlighted ? { backgroundColor: foundColor, opacity: 0.85 } : {})
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault()
@@ -180,6 +177,46 @@ export default function PuzzleGrid() {
             })
           )}
         </div>
+        {/* SVG overlay for found word circles */}
+        {solver.foundSegments.length > 0 && (
+          <svg
+            className="absolute pointer-events-none"
+            style={{ top: 2, left: 2, width: cols * cellSize, height: puzzle.grid.length * cellSize }}
+          >
+            {solver.foundSegments.map((seg, i) => {
+              const firstCell = seg.cells[0]
+              const lastCell = seg.cells[seg.cells.length - 1]
+              const cx1 = firstCell.col * cellSize + cellSize / 2
+              const cy1 = firstCell.row * cellSize + cellSize / 2
+              const cx2 = lastCell.col * cellSize + cellSize / 2
+              const cy2 = lastCell.row * cellSize + cellSize / 2
+
+              const midX = (cx1 + cx2) / 2
+              const midY = (cy1 + cy2) / 2
+              const dx = cx2 - cx1
+              const dy = cy2 - cy1
+              const length = Math.sqrt(dx * dx + dy * dy) + cellSize * 0.8
+              const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+
+              return (
+                <rect
+                  key={i}
+                  x={midX - length / 2}
+                  y={midY - cellSize * 0.45}
+                  width={length}
+                  height={cellSize * 0.9}
+                  rx={cellSize * 0.45}
+                  ry={cellSize * 0.45}
+                  fill="none"
+                  stroke={seg.color}
+                  strokeWidth={2.5}
+                  opacity={0.8}
+                  transform={`rotate(${angle}, ${midX}, ${midY})`}
+                />
+              )
+            })}
+          </svg>
+        )}
       </div>
     </div>
   )

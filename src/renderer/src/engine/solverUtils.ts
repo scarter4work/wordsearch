@@ -23,8 +23,9 @@ export function getLineCells(start: Cell, end: Cell): Cell[] | null {
   return cells
 }
 
-export function checkWordMatch(selectedCells: Cell[], placedWords: PlacedWord[]): string | null {
-  for (const pw of placedWords) {
+export function checkWordMatch(selectedCells: Cell[], placedWords: PlacedWord[]): number | null {
+  for (let idx = 0; idx < placedWords.length; idx++) {
+    const pw = placedWords[idx]
     if (pw.cells.length !== selectedCells.length) continue
     const forwardMatch = pw.cells.every(
       (c, i) => c.row === selectedCells[i].row && c.col === selectedCells[i].col
@@ -34,7 +35,7 @@ export function checkWordMatch(selectedCells: Cell[], placedWords: PlacedWord[])
         c.row === selectedCells[selectedCells.length - 1 - i].row &&
         c.col === selectedCells[selectedCells.length - 1 - i].col
     )
-    if (forwardMatch || reverseMatch) return pw.word
+    if (forwardMatch || reverseMatch) return idx
   }
   return null
 }

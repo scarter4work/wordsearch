@@ -42,7 +42,7 @@ describe('checkWordMatch', () => {
       cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }]
     }]
     const selectedCells = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }]
-    expect(checkWordMatch(selectedCells, placed)).toBe('CAT')
+    expect(checkWordMatch(selectedCells, placed)).toBe(0)
   })
 
   it('matches a placed word by cells (reverse selection)', () => {
@@ -51,7 +51,7 @@ describe('checkWordMatch', () => {
       cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }]
     }]
     const selectedCells = [{ row: 0, col: 2 }, { row: 0, col: 1 }, { row: 0, col: 0 }]
-    expect(checkWordMatch(selectedCells, placed)).toBe('CAT')
+    expect(checkWordMatch(selectedCells, placed)).toBe(0)
   })
 
   it('returns null for non-matching selection', () => {

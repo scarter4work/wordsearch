@@ -61,4 +61,27 @@ describe('puzzleReducer', () => {
     const state = puzzleReducer(stateWithFound, { type: 'SET_PUZZLE', payload: puzzle })
     expect(state.solver.foundWords.size).toBe(0)
   })
+
+  it('clears all words', () => {
+    const withWords = {
+      ...initialState,
+      words: [
+        { id: '1', word: 'CAT', optional: false, canRepeatedlySpawn: false, spawnWeight: 1, hint: '' },
+        { id: '2', word: 'DOG', optional: false, canRepeatedlySpawn: false, spawnWeight: 1, hint: '' }
+      ]
+    }
+    const state = puzzleReducer(withWords, { type: 'CLEAR_WORDS' })
+    expect(state.words).toHaveLength(0)
+  })
+
+  it('marks a word found by placement index', () => {
+    const cells = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }]
+    const state = puzzleReducer(initialState, {
+      type: 'MARK_WORD_FOUND',
+      payload: { index: 2, word: 'CAT', cells, color: '#ef4444' }
+    })
+    expect(state.solver.foundWords.has(2)).toBe(true)
+    expect(state.solver.foundSegments).toHaveLength(1)
+    expect(state.solver.foundSegments[0]).toEqual({ word: 'CAT', cells, color: '#ef4444' })
+  })
 })

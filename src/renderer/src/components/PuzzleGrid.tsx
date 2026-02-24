@@ -180,8 +180,8 @@ export default function PuzzleGrid() {
         {/* SVG overlay for found word circles */}
         {solver.foundSegments.length > 0 && (
           <svg
-            className="absolute top-0 left-0 pointer-events-none"
-            style={{ width: cols * cellSize, height: puzzle.grid.length * cellSize }}
+            className="absolute pointer-events-none"
+            style={{ top: 2, left: 2, width: cols * cellSize, height: puzzle.grid.length * cellSize }}
           >
             {solver.foundSegments.map((seg, i) => {
               const firstCell = seg.cells[0]

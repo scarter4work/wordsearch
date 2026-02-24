@@ -2,7 +2,7 @@ import { usePuzzle } from '@/state/PuzzleContext'
 
 export default function WordBankDisplay() {
   const { state } = usePuzzle()
-  const { puzzle, config } = state
+  const { puzzle, config, solver } = state
 
   if (!config.wordBank || !puzzle) return null
 
@@ -24,15 +24,20 @@ export default function WordBankDisplay() {
 
       <h3 className="text-sm font-semibold text-gray-300 mb-2">Word Bank</h3>
       <div className="flex flex-wrap gap-2">
-        {wordEntries.map(([word, count]) => (
-          <span
-            key={word}
-            className="px-2 py-1 text-sm bg-gray-700 rounded"
-          >
-            {word}
-            {count > 1 && ` (x${count})`}
-          </span>
-        ))}
+        {wordEntries.map(([word, count]) => {
+          const isFound = solver.foundWords.has(word)
+          return (
+            <span
+              key={word}
+              className={`px-2 py-1 text-sm bg-gray-700 rounded transition-opacity ${
+                isFound ? 'line-through opacity-40' : ''
+              }`}
+            >
+              {word}
+              {count > 1 && ` (x${count})`}
+            </span>
+          )
+        })}
       </div>
     </div>
   )

@@ -52,11 +52,11 @@ describe('puzzleReducer', () => {
     expect(state.display.fontSize).toBe(24)
     expect(state.puzzle).toBeNull()
     expect(state.solver.foundWords).toBeInstanceOf(Set)
-    expect(state.solver.foundCells).toBeInstanceOf(Map)
+    expect(state.solver.foundSegments).toEqual([])
   })
 
   it('resets solver when new puzzle is generated', () => {
-    const stateWithFound = { ...initialState, solver: { ...initialState.solver, foundWords: new Set(['TEST']) } }
+    const stateWithFound = { ...initialState, solver: { ...initialState.solver, foundWords: new Set([0]) } }
     const puzzle = { grid: [['A']], placedWords: [], skippedWords: [], wordCounts: {}, hints: [] }
     const state = puzzleReducer(stateWithFound, { type: 'SET_PUZZLE', payload: puzzle })
     expect(state.solver.foundWords.size).toBe(0)

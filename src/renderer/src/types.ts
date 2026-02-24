@@ -52,11 +52,17 @@ export interface GeneratedPuzzle {
   hints: Array<{ word: string; hint: string }>
 }
 
+export interface FoundWordSegment {
+  word: string
+  cells: Array<{ row: number; col: number }>
+  color: string
+}
+
 export interface SolverState {
-  foundWords: Set<string>
+  foundWords: Set<number>  // indices into puzzle.placedWords
   selectionStart: { row: number; col: number } | null
   selectionEnd: { row: number; col: number } | null
-  foundCells: Map<string, string> // "row,col" -> color
+  foundSegments: FoundWordSegment[]
 }
 
 export interface AppState {

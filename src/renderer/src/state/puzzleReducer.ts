@@ -1,4 +1,4 @@
-import type { AppState, WordEntry, PuzzleConfig, DisplaySettings, GeneratedPuzzle, SolverState } from '../types'
+import type { AppState, WordEntry, PuzzleConfig, DisplaySettings, GeneratedPuzzle, SolverState, FoundWordSegment } from '../types'
 
 export const initialState: AppState = {
   words: [],
@@ -27,10 +27,10 @@ export const initialState: AppState = {
   },
   puzzle: null,
   solver: {
-    foundWords: new Set<string>(),
+    foundWords: new Set<number>(),
     selectionStart: null,
     selectionEnd: null,
-    foundCells: new Map<string, string>()
+    foundSegments: []
   }
 }
 
@@ -42,7 +42,7 @@ export type Action =
   | { type: 'UPDATE_CONFIG'; payload: Partial<PuzzleConfig> }
   | { type: 'UPDATE_DISPLAY'; payload: Partial<DisplaySettings> }
   | { type: 'SET_PUZZLE'; payload: GeneratedPuzzle }
-  | { type: 'MARK_WORD_FOUND'; payload: { word: string; cells: Array<{ row: number; col: number }>; color: string } }
+  | { type: 'MARK_WORD_FOUND'; payload: { index: number; word: string; cells: Array<{ row: number; col: number }>; color: string } }
   | { type: 'RESET_SOLVER' }
   | { type: 'SET_SELECTION'; payload: { start: { row: number; col: number } | null; end: { row: number; col: number } | null } }
   | { type: 'CLEAR_WORDS' }
@@ -50,10 +50,10 @@ export type Action =
 
 function resetSolver(): SolverState {
   return {
-    foundWords: new Set<string>(),
+    foundWords: new Set<number>(),
     selectionStart: null,
     selectionEnd: null,
-    foundCells: new Map<string, string>()
+    foundSegments: []
   }
 }
 
@@ -87,14 +87,17 @@ export function puzzleReducer(state: AppState, action: Action): AppState {
 
     case 'MARK_WORD_FOUND': {
       const newFoundWords = new Set(state.solver.foundWords)
-      newFoundWords.add(action.payload.word)
-      const newFoundCells = new Map(state.solver.foundCells)
-      for (const cell of action.payload.cells) {
-        newFoundCells.set(`${cell.row},${cell.col}`, action.payload.color)
-      }
+      newFoundWords.add(action.payload.index)
       return {
         ...state,
-        solver: { ...state.solver, foundWords: newFoundWords, foundCells: newFoundCells }
+        solver: {
+          ...state.solver,
+          foundWords: newFoundWords,
+          foundSegments: [
+            ...state.solver.foundSegments,
+            { word: action.payload.word, cells: action.payload.cells, color: action.payload.color }
+          ]
+        }
       }
     }
 

@@ -51,12 +51,13 @@ export default function PuzzleGrid() {
     isDragging.current = false
 
     if (highlightedCells.length > 0) {
-      const matchedWord = checkWordMatch(highlightedCells, puzzle.placedWords)
-      if (matchedWord && !solver.foundWords.has(matchedWord)) {
+      const matchedIdx = checkWordMatch(highlightedCells, puzzle.placedWords)
+      if (matchedIdx !== null && !solver.foundWords.has(matchedIdx)) {
         const color = getNextColor()
+        const pw = puzzle.placedWords[matchedIdx]
         dispatch({
           type: 'MARK_WORD_FOUND',
-          payload: { word: matchedWord, cells: highlightedCells, color }
+          payload: { index: matchedIdx, word: pw.word, cells: highlightedCells, color }
         })
       }
     }
@@ -68,15 +69,15 @@ export default function PuzzleGrid() {
 
   const handleRevealAll = useCallback(() => {
     if (!puzzle) return
-    for (const pw of puzzle.placedWords) {
-      if (!solver.foundWords.has(pw.word)) {
+    puzzle.placedWords.forEach((pw, idx) => {
+      if (!solver.foundWords.has(idx)) {
         const color = getNextColor()
         dispatch({
           type: 'MARK_WORD_FOUND',
-          payload: { word: pw.word, cells: pw.cells, color }
+          payload: { index: idx, word: pw.word, cells: pw.cells, color }
         })
       }
-    }
+    })
   }, [puzzle, solver.foundWords, getNextColor, dispatch])
 
   if (!puzzle) {
@@ -127,7 +128,7 @@ export default function PuzzleGrid() {
       </div>
 
       {/* Grid container */}
-      <div className="puzzle-grid-area inline-block border-2 border-gray-300 shadow-lg shadow-black/30 bg-gray-900/50">
+      <div className="puzzle-grid-area relative inline-block border-2 border-gray-300 shadow-lg shadow-black/30 bg-gray-900/50">
         <div
           className="inline-grid"
           style={{
@@ -146,7 +147,6 @@ export default function PuzzleGrid() {
           {puzzle.grid.flatMap((row, rowIdx) =>
             row.map((letter, colIdx) => {
               const cellKey = `${rowIdx},${colIdx}`
-              const foundColor = solver.foundCells.get(cellKey)
               const isHighlighted = highlightSet.has(cellKey)
 
               return (
@@ -177,6 +177,46 @@ export default function PuzzleGrid() {
             })
           )}
         </div>
+        {/* SVG overlay for found word circles */}
+        {solver.foundSegments.length > 0 && (
+          <svg
+            className="absolute top-0 left-0 pointer-events-none"
+            style={{ width: cols * cellSize, height: puzzle.grid.length * cellSize }}
+          >
+            {solver.foundSegments.map((seg, i) => {
+              const firstCell = seg.cells[0]
+              const lastCell = seg.cells[seg.cells.length - 1]
+              const cx1 = firstCell.col * cellSize + cellSize / 2
+              const cy1 = firstCell.row * cellSize + cellSize / 2
+              const cx2 = lastCell.col * cellSize + cellSize / 2
+              const cy2 = lastCell.row * cellSize + cellSize / 2
+
+              const midX = (cx1 + cx2) / 2
+              const midY = (cy1 + cy2) / 2
+              const dx = cx2 - cx1
+              const dy = cy2 - cy1
+              const length = Math.sqrt(dx * dx + dy * dy) + cellSize * 0.8
+              const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+
+              return (
+                <rect
+                  key={i}
+                  x={midX - length / 2}
+                  y={midY - cellSize * 0.45}
+                  width={length}
+                  height={cellSize * 0.9}
+                  rx={cellSize * 0.45}
+                  ry={cellSize * 0.45}
+                  fill="none"
+                  stroke={seg.color}
+                  strokeWidth={2.5}
+                  opacity={0.8}
+                  transform={`rotate(${angle}, ${midX}, ${midY})`}
+                />
+              )
+            })}
+          </svg>
+        )}
       </div>
     </div>
   )

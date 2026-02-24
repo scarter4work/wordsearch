@@ -127,12 +127,12 @@ export default function PuzzleGrid() {
       </div>
 
       {/* Grid container */}
-      <div className="puzzle-grid-area inline-block rounded-xl border border-gray-800 shadow-lg shadow-black/30 bg-gray-900/50 p-3">
+      <div className="puzzle-grid-area inline-block border-2 border-gray-300 shadow-lg shadow-black/30 bg-gray-900/50">
         <div
           className="inline-grid"
           style={{
             gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-            gap: `${display.cellSpacing}px`
+            gap: '0px'
           }}
           onMouseLeave={() => {
             if (isDragging.current) {
@@ -152,12 +152,10 @@ export default function PuzzleGrid() {
               return (
                 <div
                   key={cellKey}
-                  className={`rounded-md flex items-center justify-center select-none cursor-pointer font-medium transition-all duration-150 ${
+                  className={`flex items-center justify-center select-none cursor-pointer font-medium transition-all duration-150 border-[0.5px] border-gray-700/40 ${
                     isHighlighted
-                      ? 'bg-blue-500/50 scale-105'
-                      : foundColor
-                        ? 'rounded-md'
-                        : 'bg-gray-800 hover:bg-gray-700/80'
+                      ? 'bg-blue-500/50'
+                      : 'hover:bg-gray-800/50'
                   }`}
                   style={{
                     width: cellSize,
@@ -165,7 +163,6 @@ export default function PuzzleGrid() {
                     fontFamily: display.fontFamily,
                     fontSize: `${display.fontSize}px`,
                     lineHeight: 1,
-                    ...(foundColor && !isHighlighted ? { backgroundColor: foundColor, opacity: 0.85 } : {})
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault()

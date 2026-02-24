@@ -22,8 +22,10 @@ export function renderPuzzleToDataUrl(
   const bodyFontSize = display.fontSize * 0.85
   const sectionGap = 24
 
+  const hasTitle = config.title.trim().length > 0
+
   // Pre-calculate content height
-  let contentHeight = padding + titleFontSize + 20 + gridHeight + sectionGap
+  let contentHeight = padding + (hasTitle ? titleFontSize + 20 : 0) + gridHeight + sectionGap
 
   // Hints section height
   if (config.showHints && hints.length > 0) {
@@ -57,11 +59,13 @@ export function renderPuzzleToDataUrl(
 
   // Title
   let y = padding
-  ctx.font = `bold ${titleFontSize}px ${display.fontFamily}`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'top'
-  ctx.fillText(config.title, canvasWidth / 2, y)
-  y += titleFontSize + 20
+  if (hasTitle) {
+    ctx.font = `bold ${titleFontSize}px ${display.fontFamily}`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'top'
+    ctx.fillText(config.title, canvasWidth / 2, y)
+    y += titleFontSize + 20
+  }
 
   // Grid
   const gridLeft = (canvasWidth - gridWidth) / 2

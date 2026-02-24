@@ -64,7 +64,7 @@ export default function Header() {
         {/* Accent line */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-blue-600/0 via-blue-500/40 to-blue-600/0" />
 
-        <h1 className="text-lg font-semibold truncate text-gray-100">{state.config.title}</h1>
+        <h1 className="text-lg font-semibold truncate text-gray-100">{state.config.title || <span className="text-gray-500 italic">Word Search Generator</span>}</h1>
         <div className="flex items-center gap-2">
           {/* File operations */}
           <button

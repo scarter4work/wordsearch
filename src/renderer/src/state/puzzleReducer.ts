@@ -14,7 +14,7 @@ export const initialState: AppState = {
     letterCase: 'uppercase',
     gridWidth: 15,
     gridHeight: 15,
-    title: 'Input Title',
+    title: '',
     wordBank: true,
     showHints: false,
     intersectWords: 3,

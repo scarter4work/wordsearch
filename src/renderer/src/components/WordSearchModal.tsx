@@ -100,6 +100,7 @@ export default function WordSearchModal({ isOpen, onClose }: WordSearchModalProp
         <div className="flex gap-2 mb-4">
           <input
             type="text"
+            autoFocus
             value={concept}
             onChange={(e) => setConcept(e.target.value)}
             onKeyDown={handleKeyDown}

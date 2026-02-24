@@ -1,6 +1,6 @@
 interface Window {
   api: {
-    exportPdf: () => Promise<string | null>
+    exportPdf: (dataUrl: string) => Promise<string | null>
     exportPng: (dataUrl: string) => Promise<string | null>
     saveProject: (data: string) => Promise<string | null>
     loadProject: () => Promise<string | null>

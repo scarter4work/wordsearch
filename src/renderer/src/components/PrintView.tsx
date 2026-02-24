@@ -55,8 +55,11 @@ export default function PrintView({ puzzle, config, display }: PrintViewProps) {
                 justifyContent: 'center',
                 fontSize: display.fontSize,
                 fontFamily: display.fontFamily,
+                fontWeight: 600,
                 border: '1px solid #ccc',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                lineHeight: 1,
+                textAlign: 'center' as const
               }}
             >
               {letter}

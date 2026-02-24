@@ -30,7 +30,11 @@ export default function Header() {
   }
 
   const handleExportPdf = useCallback(async () => {
-    await window.api.exportPdf()
+    const el = printRef.current
+    if (!el) return
+    const canvas = await html2canvas(el, { backgroundColor: '#ffffff' })
+    const dataUrl = canvas.toDataURL('image/png')
+    await window.api.exportPdf(dataUrl)
     addToast('Export complete')
   }, [addToast])
 

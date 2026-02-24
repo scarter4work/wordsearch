@@ -25,7 +25,7 @@ function createWindow(): void {
 app.whenReady().then(createWindow)
 app.on('window-all-closed', () => app.quit())
 
-ipcMain.handle('export-pdf', async (event) => {
+ipcMain.handle('export-pdf', async (event, dataUrl: string) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (!win) return null
   const { filePath } = await dialog.showSaveDialog(win, {
@@ -33,12 +33,32 @@ ipcMain.handle('export-pdf', async (event) => {
     filters: [{ name: 'PDF', extensions: ['pdf'] }]
   })
   if (!filePath) return null
-  const pdf = await win.webContents.printToPDF({
+
+  // Create a hidden window with just the puzzle image
+  const printWin = new BrowserWindow({
+    width: 816,
+    height: 1056,
+    show: false,
+    webPreferences: { offscreen: true }
+  })
+
+  const html = `<!DOCTYPE html><html><head><style>
+    * { margin: 0; padding: 0; }
+    body { display: flex; justify-content: center; padding: 20px; background: white; }
+    img { max-width: 100%; height: auto; }
+  </style></head><body><img src="${dataUrl}" /></body></html>`
+
+  await printWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)
+  await new Promise(resolve => setTimeout(resolve, 500))
+
+  const pdf = await printWin.webContents.printToPDF({
     printBackground: true,
     landscape: false,
-    pageSize: 'Letter'
+    pageSize: 'Letter',
+    margins: { top: 0.4, bottom: 0.4, left: 0.4, right: 0.4 }
   })
   await writeFile(filePath, pdf)
+  printWin.close()
   return filePath
 })
 

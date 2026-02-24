@@ -66,6 +66,17 @@ ipcMain.handle('load-project', async (event) => {
   return content
 })
 
+ipcMain.handle('search-words', async (_event, concept: string) => {
+  try {
+    const url = `https://api.datamuse.com/words?ml=${encodeURIComponent(concept)}&max=50`
+    const response = await fetch(url)
+    const data = await response.json()
+    return data.map((item: { word: string; score: number }) => item.word)
+  } catch {
+    return []
+  }
+})
+
 ipcMain.handle('export-png', async (_event, dataUrl: string) => {
   const win = BrowserWindow.getFocusedWindow()
   if (!win) return null

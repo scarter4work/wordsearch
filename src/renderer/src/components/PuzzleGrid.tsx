@@ -127,7 +127,7 @@ export default function PuzzleGrid() {
       </div>
 
       {/* Grid container */}
-      <div className="inline-block rounded-xl border border-gray-800 shadow-lg shadow-black/30 bg-gray-900/50 p-3">
+      <div className="puzzle-grid-area inline-block rounded-xl border border-gray-800 shadow-lg shadow-black/30 bg-gray-900/50 p-3">
         <div
           className="inline-grid"
           style={{

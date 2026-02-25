@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { WordEntry } from '../types'
+import { usePuzzle } from '../state/PuzzleContext'
 
 interface WordCardProps {
   word: WordEntry
@@ -8,6 +9,9 @@ interface WordCardProps {
 }
 
 export default function WordCard({ word, onUpdate, onRemove }: WordCardProps) {
+  const { state } = usePuzzle()
+  const maxDim = Math.max(state.config.gridWidth, state.config.gridHeight)
+  const isTooLong = word.word.trim().length > maxDim
   const [showPopover, setShowPopover] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
   const gearRef = useRef<HTMLButtonElement>(null)
@@ -35,8 +39,11 @@ export default function WordCard({ word, onUpdate, onRemove }: WordCardProps) {
         value={word.word}
         onChange={(e) => onUpdate({ word: e.target.value })}
         placeholder="word..."
-        className="flex-1 min-w-0 bg-transparent text-sm text-gray-100 placeholder-gray-600 outline-none border-b border-transparent focus:border-blue-500/50 transition-colors py-0.5"
+        className={`flex-1 min-w-0 bg-transparent text-sm placeholder-gray-600 outline-none border-b transition-colors py-0.5 ${isTooLong ? 'text-amber-400 border-amber-500/50' : 'text-gray-100 border-transparent focus:border-blue-500/50'}`}
       />
+      {isTooLong && (
+        <span className="text-[9px] uppercase tracking-wider text-amber-400/70 bg-amber-400/10 px-1 rounded flex-shrink-0" title={`Word is ${word.word.trim().length} chars, grid max is ${maxDim}`}>!</span>
+      )}
 
       {/* Inline badges */}
       {word.optional && (

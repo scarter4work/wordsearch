@@ -211,6 +211,15 @@ export default function ConfigPanel() {
             />
             Show Hints
           </label>
+          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-gray-200 transition-colors">
+            <input
+              type="checkbox"
+              checked={config.allowParallelContainment}
+              onChange={(e) => updateConfig({ allowParallelContainment: e.target.checked })}
+              className="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+            />
+            Allow Parallel Containment
+          </label>
         </div>
 
         <hr className="border-gray-800" />

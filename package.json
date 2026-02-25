@@ -1,6 +1,6 @@
 {
   "name": "wordsearch",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Word Search Puzzle Generator",
   "main": "./out/main/index.js",
   "scripts": {

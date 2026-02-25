@@ -20,6 +20,11 @@ export default function Header() {
     if (emptyCount > 0) {
       addToast(`Skipped ${emptyCount} empty word${emptyCount > 1 ? 's' : ''}`)
     }
+    const maxDim = Math.max(state.config.gridWidth, state.config.gridHeight)
+    const oversized = validWords.filter((w) => w.word.trim().length > maxDim)
+    if (oversized.length > 0) {
+      addToast(`Warning: ${oversized.map((w) => `"${w.word.trim()}"`).join(', ')} longer than grid size (${maxDim}) — may not be placed`)
+    }
     setIsGenerating(true)
     // Use a microtask to allow UI to update before generating
     setTimeout(() => {

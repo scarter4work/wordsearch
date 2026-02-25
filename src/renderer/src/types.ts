@@ -28,6 +28,7 @@ export interface PuzzleConfig {
   showHints: boolean
   intersectWords: number // 1-5
   generationEffort: number // 1-100
+  allowParallelContainment: boolean
 }
 
 export interface DisplaySettings {

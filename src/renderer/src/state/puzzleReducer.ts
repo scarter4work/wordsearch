@@ -18,7 +18,8 @@ export const initialState: AppState = {
     wordBank: true,
     showHints: false,
     intersectWords: 3,
-    generationEffort: 20
+    generationEffort: 20,
+    allowParallelContainment: false
   },
   display: {
     fontFamily: 'monospace',
@@ -117,14 +118,20 @@ export function puzzleReducer(state: AppState, action: Action): AppState {
     case 'CLEAR_WORDS':
       return { ...state, words: [] }
 
-    case 'LOAD_STATE':
+    case 'LOAD_STATE': {
+      const loadedConfig = { ...initialState.config, ...action.payload.config }
+      // Migrate old 'both' letterCase to 'preserve'
+      if ((loadedConfig.letterCase as string) === 'both') {
+        loadedConfig.letterCase = 'preserve'
+      }
       return {
         words: action.payload.words,
-        config: { ...initialState.config, ...action.payload.config },
+        config: loadedConfig,
         display: { ...initialState.display, ...action.payload.display },
         puzzle: null,
         solver: resetSolver()
       }
+    }
 
     default:
       return state

@@ -171,7 +171,11 @@ function buildPlacementList(words: WordEntry[], letterCase: string): Array<{ wor
     list.push({ word: casedWord, hint: entry.hint })
 
     if (entry.canRepeatedlySpawn) {
-      const extraCopies = Math.floor(entry.spawnWeight)
+      // Use spawnWeight as average repeat count with randomness
+      const baseCount = Math.floor(entry.spawnWeight)
+      const fractional = entry.spawnWeight - baseCount
+      // The fractional part becomes a probability of one extra copy
+      const extraCopies = baseCount + (Math.random() < fractional ? 1 : 0)
       for (let i = 0; i < extraCopies; i++) {
         list.push({ word: casedWord, hint: entry.hint })
       }
@@ -182,6 +186,38 @@ function buildPlacementList(words: WordEntry[], letterCase: string): Array<{ wor
   list.sort((a, b) => b.word.length - a.word.length)
 
   return list
+}
+
+function isDuplicateOverlap(
+  candidate: PlacementCandidate,
+  word: string,
+  placed: PlacedWord[]
+): boolean {
+  return placed.some(
+    (pw) =>
+      pw.word === word &&
+      pw.cells.length === candidate.cells.length &&
+      pw.cells.every((c, i) => c.row === candidate.cells[i].row && c.col === candidate.cells[i].col)
+  )
+}
+
+function isParallelContainment(
+  candidate: PlacementCandidate,
+  placed: PlacedWord[]
+): boolean {
+  const candidateCellSet = new Set(candidate.cells.map((c) => `${c.row},${c.col}`))
+
+  for (const pw of placed) {
+    const pwCellSet = new Set(pw.cells.map((c) => `${c.row},${c.col}`))
+
+    // Check if candidate is fully contained within an existing word
+    const candidateInPw = candidate.cells.every((c) => pwCellSet.has(`${c.row},${c.col}`))
+    // Check if an existing word is fully contained within candidate
+    const pwInCandidate = pw.cells.every((c) => candidateCellSet.has(`${c.row},${c.col}`))
+
+    if (candidateInPw || pwInCandidate) return true
+  }
+  return false
 }
 
 export function generatePuzzle(words: WordEntry[], config: PuzzleConfig): GeneratedPuzzle {
@@ -209,7 +245,11 @@ export function generatePuzzle(words: WordEntry[], config: PuzzleConfig): Genera
       tryPlace(grid, entry.word, directions, maxAttempts * 2, intersectNorm) ??
       tryPlaceTargeted(grid, entry.word, directions, maxAttempts * 2, intersectNorm)
 
-    if (candidate) {
+    const duplicateBlocked = candidate && isDuplicateOverlap(candidate, entry.word, placedWords)
+    const parallelBlocked =
+      candidate && !config.allowParallelContainment && isParallelContainment(candidate, placedWords)
+
+    if (candidate && !duplicateBlocked && !parallelBlocked) {
       // Place the word on the grid
       for (let i = 0; i < entry.word.length; i++) {
         const r = candidate.cells[i].row
@@ -225,11 +265,11 @@ export function generatePuzzle(words: WordEntry[], config: PuzzleConfig): Genera
         cells: candidate.cells
       })
 
-      wordCounts[entry.word] = (wordCounts[entry.word] || 0) + 1
-
-      if (entry.hint) {
+      if (entry.hint && !wordCounts[entry.word]) {
         hints.push({ word: entry.word, hint: entry.hint })
       }
+
+      wordCounts[entry.word] = (wordCounts[entry.word] || 0) + 1
     } else {
       if (!skippedWords.includes(entry.word)) {
         skippedWords.push(entry.word)

@@ -11,15 +11,24 @@ export default function Header() {
 
   function handleGenerate() {
     if (state.words.length === 0) return
+    const validWords = state.words.filter((w) => w.word.trim().length > 0)
+    if (validWords.length === 0) {
+      addToast('No valid words to generate — words must be at least 1 character')
+      return
+    }
+    const emptyCount = state.words.length - validWords.length
+    if (emptyCount > 0) {
+      addToast(`Skipped ${emptyCount} empty word${emptyCount > 1 ? 's' : ''}`)
+    }
     setIsGenerating(true)
     // Use a microtask to allow UI to update before generating
     setTimeout(() => {
-      const result = generatePuzzle(state.words, state.config)
+      const result = generatePuzzle(validWords, state.config)
       dispatch({ type: 'SET_PUZZLE', payload: result })
       const placed = result.placedWords.length
       const skipped = result.skippedWords.length
       if (skipped > 0) {
-        addToast(`Puzzle generated! ${placed} words placed, ${skipped} skipped`)
+        addToast(`Puzzle generated! ${placed} placed, ${skipped} skipped: ${result.skippedWords.join(', ')}`)
       } else {
         addToast(`Puzzle generated! ${placed} words placed`)
       }

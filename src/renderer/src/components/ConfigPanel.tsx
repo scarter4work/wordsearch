@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { usePuzzle } from '../state/PuzzleContext'
+import { useToast } from '../App'
 import type { LetterCase } from '../types'
 
 export default function ConfigPanel() {
   const { state, dispatch } = usePuzzle()
   const { config } = state
+  const { addToast } = useToast()
   const [collapsed, setCollapsed] = useState(false)
   const [localGridWidth, setLocalGridWidth] = useState(String(config.gridWidth))
   const [localGridHeight, setLocalGridHeight] = useState(String(config.gridHeight))
@@ -127,9 +129,17 @@ export default function ConfigPanel() {
                 min={5}
                 max={50}
                 value={localGridWidth}
-                onChange={(e) => setLocalGridWidth(e.target.value)}
+                onChange={(e) => {
+                  setLocalGridWidth(e.target.value)
+                  const num = Number(e.target.value)
+                  if (!isNaN(num) && num >= 5 && num <= 50) {
+                    updateConfig({ gridWidth: num })
+                  }
+                }}
                 onBlur={() => {
-                  const v = Math.max(5, Math.min(50, Number(localGridWidth) || 5))
+                  const raw = Number(localGridWidth) || 5
+                  const v = Math.max(5, Math.min(50, raw))
+                  if (v !== raw) addToast(`Grid width clamped to ${v} (range: 5–50)`)
                   setLocalGridWidth(String(v))
                   updateConfig({ gridWidth: v })
                 }}
@@ -143,9 +153,17 @@ export default function ConfigPanel() {
                 min={5}
                 max={50}
                 value={localGridHeight}
-                onChange={(e) => setLocalGridHeight(e.target.value)}
+                onChange={(e) => {
+                  setLocalGridHeight(e.target.value)
+                  const num = Number(e.target.value)
+                  if (!isNaN(num) && num >= 5 && num <= 50) {
+                    updateConfig({ gridHeight: num })
+                  }
+                }}
                 onBlur={() => {
-                  const v = Math.max(5, Math.min(50, Number(localGridHeight) || 5))
+                  const raw = Number(localGridHeight) || 5
+                  const v = Math.max(5, Math.min(50, raw))
+                  if (v !== raw) addToast(`Grid height clamped to ${v} (range: 5–50)`)
                   setLocalGridHeight(String(v))
                   updateConfig({ gridHeight: v })
                 }}

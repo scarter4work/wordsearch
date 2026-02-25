@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { usePuzzle } from '../state/PuzzleContext'
+import { useToast } from '../App'
 
 const FONT_OPTIONS = [
   'Courier New',
@@ -13,12 +14,14 @@ const FONT_OPTIONS = [
   'Times New Roman',
   'Palatino Linotype',
   'Lucida Console',
+  'Oswald',
   'monospace'
 ]
 
 export default function DisplaySettingsPanel() {
   const { state, dispatch } = usePuzzle()
   const { display } = state
+  const { addToast } = useToast()
   const [collapsed, setCollapsed] = useState(false)
   const [localFontSize, setLocalFontSize] = useState(String(display.fontSize))
   const [localCellSpacing, setLocalCellSpacing] = useState(String(display.cellSpacing))
@@ -90,9 +93,17 @@ export default function DisplaySettingsPanel() {
             min={8}
             max={48}
             value={localFontSize}
-            onChange={(e) => setLocalFontSize(e.target.value)}
+            onChange={(e) => {
+              setLocalFontSize(e.target.value)
+              const num = Number(e.target.value)
+              if (!isNaN(num) && num >= 8 && num <= 48) {
+                updateDisplay({ fontSize: num })
+              }
+            }}
             onBlur={() => {
-              const v = Math.max(8, Math.min(48, Number(localFontSize) || 8))
+              const raw = Number(localFontSize) || 8
+              const v = Math.max(8, Math.min(48, raw))
+              if (v !== raw) addToast(`Font size clamped to ${v} (range: 8–48)`)
               setLocalFontSize(String(v))
               updateDisplay({ fontSize: v })
             }}
@@ -110,9 +121,17 @@ export default function DisplaySettingsPanel() {
             min={0}
             max={16}
             value={localCellSpacing}
-            onChange={(e) => setLocalCellSpacing(e.target.value)}
+            onChange={(e) => {
+              setLocalCellSpacing(e.target.value)
+              const num = Number(e.target.value)
+              if (!isNaN(num) && num >= 0 && num <= 16) {
+                updateDisplay({ cellSpacing: num })
+              }
+            }}
             onBlur={() => {
-              const v = Math.max(0, Math.min(16, Number(localCellSpacing) || 0))
+              const raw = Number(localCellSpacing) || 0
+              const v = Math.max(0, Math.min(16, raw))
+              if (v !== raw) addToast(`Cell spacing clamped to ${v} (range: 0–16)`)
               setLocalCellSpacing(String(v))
               updateDisplay({ cellSpacing: v })
             }}

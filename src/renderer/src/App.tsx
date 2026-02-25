@@ -60,9 +60,11 @@ export default function App() {
         <Header />
         <div className="flex flex-1 overflow-hidden">
           {/* Left sidebar: settings + word list */}
-          <div className="w-80 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950 overflow-y-auto">
-            <ConfigPanel />
-            <DisplaySettingsPanel />
+          <div className="w-80 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-950">
+            <div className="flex-shrink-0 overflow-y-auto max-h-[60vh]">
+              <ConfigPanel />
+              <DisplaySettingsPanel />
+            </div>
             <WordListPanel />
           </div>
           {/* Right: puzzle area */}

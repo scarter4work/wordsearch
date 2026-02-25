@@ -10,11 +10,16 @@ interface WordCardProps {
 export default function WordCard({ word, onUpdate, onRemove }: WordCardProps) {
   const [showPopover, setShowPopover] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
+  const gearRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!showPopover) return
     function handleClick(e: MouseEvent) {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (
+        popoverRef.current && !popoverRef.current.contains(target) &&
+        gearRef.current && !gearRef.current.contains(target)
+      ) {
         setShowPopover(false)
       }
     }
@@ -50,6 +55,7 @@ export default function WordCard({ word, onUpdate, onRemove }: WordCardProps) {
 
       {/* Settings gear button */}
       <button
+        ref={gearRef}
         type="button"
         onClick={() => setShowPopover(!showPopover)}
         className="text-gray-600 hover:text-gray-300 transition-colors p-0.5 flex-shrink-0"

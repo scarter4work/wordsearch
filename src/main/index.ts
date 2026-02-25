@@ -43,9 +43,10 @@ ipcMain.handle('export-pdf', async (event, dataUrl: string) => {
   })
 
   const html = `<!DOCTYPE html><html><head><style>
-    * { margin: 0; padding: 0; }
-    body { display: flex; justify-content: center; padding: 20px; background: white; }
-    img { max-width: 100%; height: auto; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; }
+    body { display: flex; justify-content: center; align-items: flex-start; background: white; }
+    img { max-width: 100%; max-height: 100vh; object-fit: contain; }
   </style></head><body><img src="${dataUrl}" /></body></html>`
 
   await printWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)

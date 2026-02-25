@@ -3,6 +3,9 @@ import type { GeneratedPuzzle, PuzzleConfig, DisplaySettings } from '../types'
 /**
  * Renders the puzzle to a canvas with pixel-perfect text centering.
  * Returns a data URL of the rendered image.
+ *
+ * Uses a two-pass approach: first pass measures text to calculate exact layout,
+ * second pass renders to the correctly-sized canvas.
  */
 export function renderPuzzleToDataUrl(
   puzzle: GeneratedPuzzle,
@@ -15,37 +18,64 @@ export function renderPuzzleToDataUrl(
   const cellSize = display.fontSize + display.cellSpacing * 2 + 8
   const padding = 40
   const scale = 2 // hi-dpi for crisp output
-
   const gridWidth = cols * cellSize
   const gridHeight = rows * cellSize
   const titleFontSize = display.fontSize * 1.8
   const bodyFontSize = display.fontSize * 0.85
   const sectionGap = 24
-
   const hasTitle = config.title.trim().length > 0
+  const canvasWidth = Math.max(gridWidth + padding * 2, 400)
+  const availableWidth = canvasWidth - padding * 2
 
-  // Pre-calculate content height
+  // --- Measurement pass (temporary canvas for measureText) ---
+  const measureCanvas = document.createElement('canvas')
+  measureCanvas.width = 1
+  measureCanvas.height = 1
+  const mctx = measureCanvas.getContext('2d')!
+
+  // Prepare hint layout
+  let hintCols = 1
+  let hintTexts: string[] = []
+  if (config.showHints && hints.length > 0) {
+    mctx.font = `${bodyFontSize}px ${display.fontFamily}`
+    hintTexts = hints.map((h, i) => `${i + 1}. ${h.hint}`)
+    const maxHintWidth = Math.max(...hintTexts.map(h => mctx.measureText(h).width), 50)
+    hintCols = Math.max(1, Math.min(3, Math.floor(availableWidth / (maxHintWidth + 16))))
+  }
+
+  // Prepare word bank layout
+  let wordBankCols = 3
+  let uniqueWords: string[] = []
+  if (config.wordBank) {
+    mctx.font = `${bodyFontSize}px ${display.fontFamily}`
+    const words = puzzle.placedWords.map(pw => {
+      const count = puzzle.wordCounts[pw.word]
+      return count > 1 ? `${pw.word} (x${count})` : pw.word
+    })
+    uniqueWords = [...new Set(words)]
+    const maxWordWidth = Math.max(...uniqueWords.map(w => mctx.measureText(w).width), 50)
+    wordBankCols = Math.max(1, Math.min(5, Math.floor(availableWidth / (maxWordWidth + 16))))
+  }
+
+  // --- Calculate exact content height ---
   let contentHeight = padding + (hasTitle ? titleFontSize + 20 : 0) + gridHeight + sectionGap
 
-  // Hints section height
-  if (config.showHints && hints.length > 0) {
-    contentHeight += bodyFontSize * 1.5 // "Hints" heading
-    contentHeight += hints.length * (bodyFontSize * 1.6)
+  if (config.showHints && hintTexts.length > 0) {
+    contentHeight += bodyFontSize * 1.5 // heading
+    contentHeight += Math.ceil(hintTexts.length / hintCols) * (bodyFontSize * 1.6)
     contentHeight += sectionGap
   }
 
-  // Word bank height
-  if (config.wordBank) {
-    contentHeight += bodyFontSize * 1.5 // "Word Bank" heading
-    contentHeight += Math.ceil(puzzle.placedWords.length / 5) * (bodyFontSize * 1.8)
+  if (config.wordBank && uniqueWords.length > 0) {
+    contentHeight += bodyFontSize * 1.5 // heading
+    contentHeight += Math.ceil(uniqueWords.length / wordBankCols) * (bodyFontSize * 1.8)
   }
 
   contentHeight += padding
 
-  const canvasWidth = Math.max(gridWidth + padding * 2, 400)
   const canvasHeight = contentHeight
 
-  // Target max dimensions for Letter page (72dpi) with 0.4in margins
+  // --- Scaling to fit Letter page (72dpi) with 0.4in margins ---
   const maxPageWidth = 736  // 816 - 80
   const maxPageHeight = 976 // 1056 - 80
 
@@ -57,6 +87,7 @@ export function renderPuzzleToDataUrl(
   const effectiveWidth = Math.round(canvasWidth * scaleFactor)
   const effectiveHeight = Math.round(canvasHeight * scaleFactor)
 
+  // --- Render pass ---
   const canvas = document.createElement('canvas')
   canvas.width = effectiveWidth * scale
   canvas.height = effectiveHeight * scale
@@ -82,7 +113,6 @@ export function renderPuzzleToDataUrl(
   // Grid
   const gridLeft = (canvasWidth - gridWidth) / 2
 
-  // Draw grid cells and letters
   ctx.font = `600 ${display.fontSize}px ${display.fontFamily}`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -110,8 +140,8 @@ export function renderPuzzleToDataUrl(
 
   y += gridHeight + sectionGap
 
-  // Hints
-  if (config.showHints && hints.length > 0) {
+  // Hints (multi-column)
+  if (config.showHints && hintTexts.length > 0) {
     ctx.font = `bold ${bodyFontSize * 1.2}px ${display.fontFamily}`
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
@@ -119,15 +149,18 @@ export function renderPuzzleToDataUrl(
     y += bodyFontSize * 1.5
 
     ctx.font = `${bodyFontSize}px ${display.fontFamily}`
-    hints.forEach((h, i) => {
-      ctx.fillText(`${i + 1}. ${h.hint}`, padding + 8, y)
-      y += bodyFontSize * 1.6
+    const hintColWidth = availableWidth / hintCols
+    hintTexts.forEach((text, i) => {
+      const col = i % hintCols
+      const row = Math.floor(i / hintCols)
+      ctx.fillText(text, padding + col * hintColWidth, y + row * bodyFontSize * 1.6)
     })
+    y += Math.ceil(hintTexts.length / hintCols) * bodyFontSize * 1.6
     y += sectionGap / 2
   }
 
-  // Word bank
-  if (config.wordBank) {
+  // Word bank (dynamic columns)
+  if (config.wordBank && uniqueWords.length > 0) {
     ctx.font = `bold ${bodyFontSize * 1.2}px ${display.fontFamily}`
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
@@ -135,16 +168,10 @@ export function renderPuzzleToDataUrl(
     y += bodyFontSize * 1.5
 
     ctx.font = `${bodyFontSize}px ${display.fontFamily}`
-    const words = puzzle.placedWords.map(pw => {
-      const count = puzzle.wordCounts[pw.word]
-      return count > 1 ? `${pw.word} (x${count})` : pw.word
-    })
-    // Deduplicate
-    const unique = [...new Set(words)]
-    const colWidth = (canvasWidth - padding * 2) / 5
-    unique.forEach((word, i) => {
-      const col = i % 5
-      const row = Math.floor(i / 5)
+    const colWidth = availableWidth / wordBankCols
+    uniqueWords.forEach((word, i) => {
+      const col = i % wordBankCols
+      const row = Math.floor(i / wordBankCols)
       ctx.fillText(word, padding + col * colWidth, y + row * bodyFontSize * 1.8)
     })
   }
